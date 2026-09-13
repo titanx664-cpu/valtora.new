@@ -1,12 +1,31 @@
-import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { ArrowRight, ShieldCheck, Users, WalletCards, Sparkles } from 'lucide-react';
-import LandingSupportChat from './_components/LandingSupportChat.tsx';
-import { Button } from '@/components/ui/button.tsx';
-import { Card } from '@/components/ui/card.tsx';
-import { useQuery } from '@/lib/data-hooks.tsx';
-import { api } from '@/lib/api.ts';
-import { formatPKR } from '@/lib/format.ts';
+import LandingSupportChat from "./_components/LandingSupportChat.tsx";
+import { LandingFooter } from "./_components/landing/LandingFooter.tsx";
+import { LandingHeader } from "./_components/landing/LandingHeader.tsx";
+import { LandingHero } from "./_components/landing/LandingHero.tsx";
+import { LandingHowItWorks } from "./_components/landing/LandingHowItWorks.tsx";
+import { LandingNetwork } from "./_components/landing/LandingNetwork.tsx";
+import { LandingOperations } from "./_components/landing/LandingOperations.tsx";
+import { LandingPlans } from "./_components/landing/LandingPlans.tsx";
+import { LandingValueProps } from "./_components/landing/LandingValueProps.tsx";
+import { useQuery } from "@/lib/data-hooks.tsx";
+import { api } from "@/lib/api.ts";
 
-export default function Index(){const plans=useQuery(api.plans.getActivePlans); return <div className="min-h-screen bg-background text-foreground overflow-x-hidden"><header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl"><div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between"><span className="font-black tracking-tight text-xl text-primary emerald-glow-text">VALTORA</span><div className="flex items-center gap-2"><Link to="/login"><Button variant="ghost">Sign In</Button></Link><Link to="/register"><Button>Get Started <ArrowRight size={15}/></Button></Link></div></div></header><main><section className="relative min-h-[78vh] flex items-center"><div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_20%,oklch(0.72_0.18_155/0.16),transparent_45%)]"/><div className="max-w-6xl mx-auto px-5 py-24 grid lg:grid-cols-[1.1fr_.9fr] gap-14 items-center relative"><div><motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs text-primary"><Sparkles size={13}/> Emerald Wealth Network</motion.div><motion.h1 initial={{opacity:0,y:25}} animate={{opacity:1,y:0}} transition={{delay:.08}} className="mt-6 text-5xl md:text-7xl font-black tracking-tight leading-[.95]">Build your network.<br/><span className="text-primary emerald-glow-text">Grow with Valtora.</span></motion.h1><p className="mt-7 max-w-xl text-muted-foreground text-lg leading-8">A focused membership and referral platform with transparent plans, two-level commissions, verified deposits and controlled withdrawals.</p><div className="mt-8 flex flex-wrap gap-3"><Link to="/register"><Button size="lg">Create Account <ArrowRight size={16}/></Button></Link><a href="#plans"><Button size="lg" variant="secondary">Explore Plans</Button></a></div></div><div className="relative"><div className="aspect-square rounded-[2rem] border border-primary/20 bg-card/70 backdrop-blur-xl shadow-2xl overflow-hidden"><div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,oklch(0.72_0.18_155/0.2),transparent_45%)]"/><div className="absolute inset-10 rounded-full border border-primary/20 animate-[spin_18s_linear_infinite]"/><div className="absolute inset-20 rounded-full border border-primary/10"/><div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full bg-primary/15 border border-primary/30 shadow-[0_0_80px_oklch(0.72_0.18_155/.25)] flex items-center justify-center"><WalletCards className="text-primary" size={40}/></div>{Array.from({length:12}).map((_,i)=><span key={i} className="absolute w-2 h-2 rounded-full bg-primary/70" style={{left:`${12+((i*29)%76)}%`,top:`${15+((i*47)%70)}%`}}/>)}</div></div></div></section><section className="max-w-6xl mx-auto px-5 py-20"><div className="grid md:grid-cols-3 gap-4"><Feature icon={ShieldCheck} title="Verified deposits" text="Every deposit enters review before funds are credited."/><Feature icon={Users} title="Two-level network" text="Earn only from the two referral levels defined by your plan."/><Feature icon={WalletCards} title="Ledger-first wallet" text="Balances are calculated from server-side financial records."/></div></section><section id="plans" className="max-w-6xl mx-auto px-5 py-20"><div className="flex items-end justify-between mb-8"><div><p className="text-primary text-sm font-semibold uppercase tracking-widest">Membership</p><h2 className="text-3xl md:text-4xl font-bold mt-2">Choose your plan</h2></div></div>{plans?.length?<div className="grid md:grid-cols-3 gap-5">{plans.map((p:any)=><Card key={p._id} className="p-6 border-border bg-card/70"><p className="text-primary text-xs font-bold uppercase tracking-widest">{p.name}</p><p className="text-4xl font-black mt-3">{formatPKR(p.price)}</p><div className="mt-6 space-y-2 text-sm"><div className="flex justify-between"><span className="text-muted-foreground">Level 1</span><b>{p.level1Commission}%</b></div><div className="flex justify-between"><span className="text-muted-foreground">Level 2</span><b>{p.level2Commission}%</b></div></div><Link to="/register" className="block mt-6"><Button className="w-full">Select {p.name}</Button></Link></Card>)}</div>:<p className="text-muted-foreground">Plans will appear here once configured in the admin panel.</p>}</section><section className="max-w-6xl mx-auto px-5 py-20"><div className="rounded-3xl border border-primary/20 bg-primary/5 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"><div><h2 className="text-3xl font-bold">Ready to get started?</h2><p className="text-muted-foreground mt-2">Create your account and enter your referral code if you have one.</p></div><Link to="/register"><Button size="lg">Join Valtora <ArrowRight size={16}/></Button></Link></div></section></main><footer className="border-t border-border"><div className="max-w-6xl mx-auto px-5 py-8 text-sm text-muted-foreground flex justify-between"><span>© {new Date().getFullYear()} Valtora</span><span>Built for clarity. Operated with verification.</span></div></footer><LandingSupportChat/></div>}
-function Feature({icon:Icon,title,text}:{icon:any,title:string,text:string}){return <Card className="p-6 border-border bg-card/50"><Icon className="text-primary" size={22}/><h3 className="font-semibold mt-4">{title}</h3><p className="text-sm text-muted-foreground mt-2 leading-6">{text}</p></Card>}
+export default function Index() {
+  const plans = useQuery(api.plans.getActivePlans);
+
+  return (
+    <div className="min-h-screen overflow-x-hidden bg-background text-foreground selection:bg-primary/30">
+      <LandingHeader />
+      <main>
+        <LandingHero />
+        <LandingValueProps />
+        <LandingHowItWorks />
+        <LandingNetwork hasPlans={Boolean(plans?.length)} />
+        <LandingPlans plans={plans} />
+        <LandingOperations />
+      </main>
+      <LandingFooter />
+      <LandingSupportChat />
+    </div>
+  );
+}
