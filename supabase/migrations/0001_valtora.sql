@@ -81,11 +81,15 @@ create table if not exists public.ledger (
   direction text not null check (direction in ('credit','debit')),
   amount numeric(12,2) not null check (amount > 0),
   status text not null check (status in ('completed','pending','reversed')),
+  -- Plan purchase payments are retained in the ledger for audit/history, but
+  -- are not credits to a member's withdrawable wallet.
+  wallet_impact boolean not null default true,
   reference_id uuid,
   reference_type text,
   description text not null,
   metadata jsonb,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  constraint ledger_deposit_non_wallet check (type <> 'deposit' or wallet_impact = false)
 );
 create index if not exists ledger_user_created_idx on public.ledger(user_id, created_at desc);
 create index if not exists ledger_reference_idx on public.ledger(reference_id);
@@ -201,19 +205,20 @@ begin
 end $$;
 
 create or replace function public.get_my_wallet() returns jsonb language sql stable security definer set search_path=public as $$
-select jsonb_build_object('balance',greatest(0,coalesce((select sum(case when direction='credit' then amount else -amount end) from ledger where user_id=auth.uid() and status='completed'),0)),'totalEarnings',coalesce((select sum(amount) from ledger where user_id=auth.uid() and status='completed' and direction='credit'),0),'totalCommissions',coalesce((select sum(amount) from ledger where user_id=auth.uid() and status='completed' and type='commission'),0),'totalWithdrawals',coalesce((select sum(amount) from ledger where user_id=auth.uid() and status='completed' and type='withdrawal_debit'),0),'pendingDepositsCount',(select count(*) from deposits where user_id=auth.uid() and status='pending'),'pendingWithdrawalsCount',(select count(*) from withdrawals where user_id=auth.uid() and status='pending'),'activePlan',(select plan_snapshot from deposits where user_id=auth.uid() and status='approved' order by created_at desc limit 1));
+select jsonb_build_object('balance',greatest(0,coalesce((select sum(case when direction='credit' then amount else -amount end) from ledger where user_id=auth.uid() and wallet_impact and (status='completed' or (status='pending' and type='withdrawal_debit'))),0)),'totalEarnings',coalesce((select sum(amount) from ledger where user_id=auth.uid() and wallet_impact and status='completed' and direction='credit'),0),'totalCommissions',coalesce((select sum(amount) from ledger where user_id=auth.uid() and wallet_impact and status='completed' and type='commission'),0),'totalWithdrawals',coalesce((select sum(amount) from ledger where user_id=auth.uid() and wallet_impact and status='completed' and type='withdrawal_debit'),0),'pendingDepositsCount',(select count(*) from deposits where user_id=auth.uid() and status='pending'),'pendingWithdrawalsCount',(select count(*) from withdrawals where user_id=auth.uid() and status='pending'),'activePlan',(select plan_snapshot from deposits where user_id=auth.uid() and status='approved' order by created_at desc limit 1));
 $$;
 
 create or replace function public.request_withdrawal(p_amount numeric,p_method text,p_account_number text,p_account_name text default null,p_bank_name text default null,p_additional_info text default null) returns uuid language plpgsql security definer set search_path=public as $$
 declare uid uuid:=auth.uid(); bal numeric; id uuid; details jsonb;
 begin
- if not exists(select 1 from users where id=uid and is_active) then raise exception using message='Account inactive or not registered'; end if;
+ select id into uid from users where id=auth.uid() and is_active for update;
+ if not found then raise exception using message='Account inactive or not registered'; end if;
  if extract(dow from timezone('Asia/Karachi',now())) <> 0 then raise exception using message='Withdrawals are only available on Sundays (Asia/Karachi time).'; end if;
  if p_amount<=0 then raise exception using message='Invalid amount'; end if;
  if p_method not in ('Easypaisa','JazzCash','Bank') then raise exception using message='Unsupported withdrawal method'; end if;
  if trim(coalesce(p_account_number,''))='' then raise exception using message='Account number is required'; end if;
  if p_method='Bank' and trim(coalesce(p_bank_name,''))='' then raise exception using message='Bank name is required for bank withdrawals'; end if;
- select greatest(0,coalesce(sum(case when direction='credit' then amount else -amount end),0)) into bal from ledger where user_id=uid and status='completed';
+ select greatest(0,coalesce(sum(case when direction='credit' then amount else -amount end),0)) into bal from ledger where user_id=uid and wallet_impact and (status='completed' or (status='pending' and type='withdrawal_debit'));
  if p_amount>bal then raise exception using message='Insufficient balance'; end if;
  details=jsonb_build_object('accountNumber',trim(p_account_number),'accountName',nullif(trim(p_account_name),''),'bankName',nullif(trim(p_bank_name),''),'additionalInfo',nullif(trim(p_additional_info),''));
  insert into withdrawals(user_id,amount,method,account_details,submitted_on_sunday) values(uid,p_amount,p_method,details,true) returning withdrawals.id into id;
@@ -229,7 +234,7 @@ begin
  select * into d from deposits where id=p_deposit_id for update; if not found then raise exception using message='Deposit not found'; end if;
  if d.status<>'pending' or d.commissions_generated then raise exception using message='Deposit already processed'; end if;
  update deposits set status='approved',reviewed_by=auth.uid(),reviewed_at=nowt,admin_note=p_note,commissions_generated=true where id=d.id;
- insert into ledger(user_id,type,direction,amount,status,reference_id,reference_type,description) values(d.user_id,'deposit','credit',d.amount,'completed',d.id,'deposit',format('Deposit approved — %s plan',d.plan_snapshot->>'name'));
+ insert into ledger(user_id,type,direction,amount,status,wallet_impact,reference_id,reference_type,description) values(d.user_id,'deposit','credit',d.amount,'completed',false,d.id,'deposit',format('Plan payment approved — %s plan',d.plan_snapshot->>'name'));
  insert into notifications(user_id,type,title,message,reference_id,reference_type) values(d.user_id,'deposit_approved','Deposit Approved',format('Your %s plan deposit of PKR %s has been approved.',d.plan_snapshot->>'name',d.amount),d.id,'deposit'),(d.user_id,'plan_activated','Plan Activated',format('Your %s plan is now active!',d.plan_snapshot->>'name'),null,null);
  select * into depositor from users where id=d.user_id;
  if depositor.referred_by is not null then
@@ -264,7 +269,7 @@ create or replace function public.get_my_referrals() returns jsonb language sql 
 with l1 as (select id,name,username,created_at from users where referred_by=auth.uid()), l2 as (select u.id,u.name,u.username,u.created_at from users u join l1 on u.referred_by=l1.id)
 select jsonb_build_object('level1',coalesce((select jsonb_agg(jsonb_build_object('id',id,'name',name,'username',username,'createdAt',extract(epoch from created_at)*1000)) from l1),'[]'::jsonb),'level2',coalesce((select jsonb_agg(jsonb_build_object('id',id,'name',name,'username',username,'createdAt',extract(epoch from created_at)*1000)) from l2),'[]'::jsonb)); $$;
 
-create or replace function public.admin_get_stats() returns jsonb language sql stable security definer set search_path=public as $$ select jsonb_build_object('totalUsers',(select count(*) from users),'activeUsers',(select count(*) from users where is_active),'pendingDeposits',(select count(*) from deposits where status='pending'),'approvedDeposits',(select count(*) from deposits where status='approved'),'rejectedDeposits',(select count(*) from deposits where status='rejected'),'totalDepositVolume',coalesce((select sum(amount) from deposits where status='approved'),0),'pendingWithdrawals',(select count(*) from withdrawals where status='pending'),'completedWithdrawals',(select count(*) from withdrawals where status='completed'),'totalWithdrawalVolume',coalesce((select sum(amount) from withdrawals where status='completed'),0),'totalCommissions',coalesce((select sum(amount) from commissions),0)); $$;
+create or replace function public.admin_get_stats() returns jsonb language plpgsql security definer set search_path=public as $$ begin if not public.is_admin() then raise exception using message='Admin only'; end if; return jsonb_build_object('totalUsers',(select count(*) from users),'activeUsers',(select count(*) from users where is_active),'pendingDeposits',(select count(*) from deposits where status='pending'),'approvedDeposits',(select count(*) from deposits where status='approved'),'rejectedDeposits',(select count(*) from deposits where status='rejected'),'totalDepositVolume',coalesce((select sum(amount) from deposits where status='approved'),0),'pendingWithdrawals',(select count(*) from withdrawals where status='pending'),'completedWithdrawals',(select count(*) from withdrawals where status='completed'),'totalWithdrawalVolume',coalesce((select sum(amount) from withdrawals where status='completed'),0),'totalCommissions',coalesce((select sum(amount) from commissions),0)); end $$;
 create or replace function public.admin_total_unread() returns integer language sql stable security definer set search_path=public as $$ select case when public.is_admin() then coalesce((select sum(unread_by_admin) from support_chats),0)::integer else 0 end $$;
 
 create or replace function public.get_or_create_my_chat() returns uuid language plpgsql security definer set search_path=public as $$ declare id uuid; begin select support_chats.id into id from support_chats where user_id=auth.uid(); if id is null then insert into support_chats(user_id) values(auth.uid()) returning support_chats.id into id; end if; return id; end $$;

@@ -35,7 +35,7 @@ export default function OnboardingChecklist() {
   const completedMap: Record<string, boolean> = {
     registered: true,
     hasPlan: !!wallet.activePlan,
-    hasDeposit: wallet.totalEarnings > 0 || wallet.balance > 0,
+    hasDeposit: !!wallet.activePlan,
     hasReferral: (referrals.level1.length ?? 0) > 0,
   };
 
