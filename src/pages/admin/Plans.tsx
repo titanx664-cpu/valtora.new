@@ -80,15 +80,15 @@ export default function AdminPlans() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-4xl space-y-6 p-4 sm:mx-auto sm:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Plans</h1>
           <p className="text-muted-foreground text-sm mt-1">Manage investment plans</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" size="sm" onClick={handleSeed}>Seed Defaults</Button>
-          <Button size="sm" onClick={openCreate}><Plus size={14} className="mr-1" /> New Plan</Button>
+        <div className="grid grid-cols-2 gap-2 sm:flex">
+          <Button className="w-full sm:w-auto" variant="secondary" size="sm" onClick={handleSeed}>Seed Defaults</Button>
+          <Button className="w-full sm:w-auto" size="sm" onClick={openCreate}><Plus size={14} className="mr-1" /> New Plan</Button>
         </div>
       </div>
 
@@ -131,7 +131,7 @@ export default function AdminPlans() {
       )}
 
       <Dialog open={creating || !!editing} onOpenChange={() => { setCreating(false); setEditing(null); }}>
-        <DialogContent>
+        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>{creating ? "Create Plan" : "Edit Plan"}</DialogTitle>
           </DialogHeader>
@@ -141,9 +141,9 @@ export default function AdminPlans() {
             <div className="space-y-1.5"><Label>Level 1 Commission %</Label><Input type="number" value={form.level1} onChange={(e) => setForm(f => ({ ...f, level1: e.target.value }))} className="bg-input" /></div>
             <div className="space-y-1.5"><Label>Level 2 Commission %</Label><Input type="number" value={form.level2} onChange={(e) => setForm(f => ({ ...f, level2: e.target.value }))} className="bg-input" /></div>
           </div>
-          <DialogFooter>
-            <Button variant="secondary" onClick={() => { setCreating(false); setEditing(null); }}>Cancel</Button>
-            <Button onClick={handleSave} disabled={saving}>{saving ? "Saving..." : "Save"}</Button>
+          <DialogFooter className="sm:gap-2">
+            <Button className="w-full sm:w-auto" variant="secondary" onClick={() => { setCreating(false); setEditing(null); }}>Cancel</Button>
+            <Button className="w-full sm:w-auto" onClick={handleSave} disabled={saving}>{saving ? "Saving..." : "Save"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

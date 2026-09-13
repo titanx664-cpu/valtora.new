@@ -9,13 +9,13 @@ export default function AdminHome() {
   const stats = useQuery(api.financial.adminGetStats);
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="max-w-6xl space-y-6 p-4 sm:mx-auto sm:p-6">
       <div>
         <h1 className="text-2xl font-bold">Admin Overview</h1>
         <p className="text-muted-foreground text-sm mt-1">Real-time platform statistics</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 min-[360px]:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Total Users" value={stats?.totalUsers} icon={<Users size={18} />} />
         <StatCard label="Active Users" value={stats?.activeUsers} icon={<Users size={18} className="text-primary" />} />
         <StatCard label="Pending Deposits" value={stats?.pendingDeposits} icon={<Clock size={18} className="text-yellow-400" />} urgent={stats?.pendingDeposits ? stats.pendingDeposits > 0 : false} />

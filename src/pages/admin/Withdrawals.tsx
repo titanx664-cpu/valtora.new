@@ -53,7 +53,7 @@ export default function AdminWithdrawals() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl space-y-6 p-4 sm:mx-auto sm:p-6">
       <div>
         <h1 className="text-2xl font-bold">Withdrawals</h1>
         <p className="text-muted-foreground text-sm mt-1">Process user withdrawal requests</p>
@@ -77,7 +77,7 @@ export default function AdminWithdrawals() {
             void loadUser(w.userId);
             const u = userCache[w.userId];
             return (
-              <div key={w._id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card">
+              <div key={w._id} className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="font-medium text-sm">{u?.name ?? "..."}</p>
@@ -89,14 +89,14 @@ export default function AdminWithdrawals() {
                   </p>
                   <p className="text-xs text-muted-foreground">{formatDateTime(w._creationTime)}</p>
                 </div>
-                <div className="text-right flex-shrink-0">
+                <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:block sm:text-right">
                   <p className="font-bold text-red-400">-{formatPKR(w.amount)}</p>
                   <span className={cn("text-xs px-2 py-0.5 rounded-full", STATUS_COLORS[w.status])}>
                     {w.status}
                   </span>
                 </div>
                 {(w.status === "pending" || w.status === "processing") && (
-                  <Button size="sm" variant="secondary" onClick={() => { setSelected(w); setAction(w.status === "pending" ? "approve" : "complete"); }}>
+                  <Button className="w-full sm:w-auto" size="sm" variant="secondary" onClick={() => { setSelected(w); setAction(w.status === "pending" ? "approve" : "complete"); }}>
                     Manage
                   </Button>
                 )}
@@ -107,7 +107,7 @@ export default function AdminWithdrawals() {
       )}
 
       <Dialog open={!!selected} onOpenChange={() => { setSelected(null); setNote(""); }}>
-        <DialogContent>
+        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>Manage Withdrawal</DialogTitle>
           </DialogHeader>
@@ -139,9 +139,9 @@ export default function AdminWithdrawals() {
               </div>
             </div>
           )}
-          <DialogFooter>
-            <Button variant="secondary" onClick={() => setSelected(null)}>Cancel</Button>
-            <Button onClick={handleAction} disabled={processing}>
+          <DialogFooter className="sm:gap-2">
+            <Button className="w-full sm:w-auto" variant="secondary" onClick={() => setSelected(null)}>Cancel</Button>
+            <Button className="w-full sm:w-auto" onClick={handleAction} disabled={processing}>
               {processing ? "Processing..." : "Confirm"}
             </Button>
           </DialogFooter>
