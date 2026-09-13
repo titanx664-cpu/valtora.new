@@ -40,13 +40,13 @@ export default function TransactionsPage() {
           {ledger.page.map((entry: any) => (
             <div key={entry._id} className="flex items-center justify-between p-4 rounded-xl border border-border bg-card">
               <div>
-                <p className="text-sm font-medium">{TYPE_LABELS[entry.type] ?? entry.type}</p>
+                <p className="text-sm font-medium">{entry.walletImpact === false ? "Plan Purchase Payment" : (TYPE_LABELS[entry.type] ?? entry.type)}</p>
                 <p className="text-xs text-muted-foreground">{entry.description}</p>
                 <p className="text-xs text-muted-foreground">{formatDateTime(entry._creationTime)}</p>
               </div>
               <div className="text-right">
-                <p className={cn("font-bold", entry.direction === "credit" ? "text-emerald-400" : "text-red-400")}>
-                  {entry.direction === "credit" ? "+" : "-"}{formatPKR(entry.amount)}
+                <p className={cn("font-bold", entry.walletImpact === false ? "text-muted-foreground" : entry.direction === "credit" ? "text-emerald-400" : "text-red-400")}>
+                  {entry.walletImpact === false ? formatPKR(entry.amount) : `${entry.direction === "credit" ? "+" : "-"}${formatPKR(entry.amount)}`}
                 </p>
                 <span className={cn("text-xs px-2 py-0.5 rounded-full", STATUS_COLORS[entry.status])}>
                   {entry.status}
