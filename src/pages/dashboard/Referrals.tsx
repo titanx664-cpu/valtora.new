@@ -11,6 +11,7 @@ import { motion } from "motion/react";
 export default function ReferralsPage() {
   const user = useQuery(api.users.getCurrentUser);
   const referrals = useQuery(api.financial.getMyReferrals);
+  const plans = useQuery(api.plans.getActivePlans);
 
   const referralCode = user?.referralCode ?? "";
   const referralLink = user ? `${window.location.origin}/register?ref=${user.referralCode}` : "";
@@ -100,18 +101,14 @@ export default function ReferralsPage() {
               <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-1">Level 1 — Direct Referrals</p>
               <p className="text-sm text-muted-foreground">People you directly invite. You earn a percentage of their deposit.</p>
               <div className="mt-3 text-sm space-y-1">
-                <div className="flex justify-between"><span>Starter</span><span className="font-semibold text-primary">8%</span></div>
-                <div className="flex justify-between"><span>Growth</span><span className="font-semibold text-primary">10%</span></div>
-                <div className="flex justify-between"><span>Elite</span><span className="font-semibold text-primary">15%</span></div>
+                {plans === undefined ? <Skeleton className="h-16 w-full" /> : plans.map((plan: any) => <div key={plan._id} className="flex justify-between"><span>{plan.name}</span><span className="font-semibold text-primary">{plan.level1Commission}%</span></div>)}
               </div>
             </div>
             <div className="rounded-lg bg-muted p-4 border border-border">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Level 2 — Indirect Referrals</p>
               <p className="text-sm text-muted-foreground">People referred by your Level 1 referrals.</p>
               <div className="mt-3 text-sm space-y-1">
-                <div className="flex justify-between"><span>Starter</span><span className="font-semibold">1%</span></div>
-                <div className="flex justify-between"><span>Growth</span><span className="font-semibold">2%</span></div>
-                <div className="flex justify-between"><span>Elite</span><span className="font-semibold">4%</span></div>
+                {plans === undefined ? <Skeleton className="h-16 w-full" /> : plans.map((plan: any) => <div key={plan._id} className="flex justify-between"><span>{plan.name}</span><span className="font-semibold">{plan.level2Commission}%</span></div>)}
               </div>
             </div>
           </div>
