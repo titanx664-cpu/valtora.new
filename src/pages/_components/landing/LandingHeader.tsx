@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, Menu, X } from "lucide-react";
@@ -51,6 +52,18 @@ export function LandingHeader() {
             {menuOpen ? <X size={19} /> : <Menu size={20} />}
           </button>
         </div>
+        <div className="hidden items-center gap-2 sm:flex">
+          <Button asChild variant="ghost" className="h-10 px-4">
+            <Link to="/login">Sign In</Link>
+          </Button>
+          <Button asChild className="h-10 rounded-xl px-4 shadow-[0_10px_30px_oklch(0.72_0.18_155_/_0.18)]">
+            <Link to="/register">Get Started <ArrowRight size={15} /></Link>
+          </Button>
+        </div>
+
+        <button type="button" onClick={() => setMenuOpen((open) => !open)} className="flex size-11 items-center justify-center rounded-xl border border-border bg-card/70 text-foreground sm:hidden" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen}>
+          {menuOpen ? <X size={19} /> : <Menu size={20} />}
+        </button>
       </div>
 
       <AnimatePresence>
@@ -62,8 +75,9 @@ export function LandingHeader() {
                   {item.label}
                 </a>
               ))}
-              <div className="mt-3 border-t border-border pt-5">
-                <Button asChild variant="secondary" className="h-11 w-full rounded-xl"><Link to="/login" onClick={closeMenu}>Sign In</Link></Button>
+              <div className="mt-3 grid grid-cols-2 gap-3 border-t border-border pt-5">
+                <Button asChild variant="secondary" className="h-11 rounded-xl"><Link to="/login" onClick={closeMenu}>Sign In</Link></Button>
+                <Button asChild className="h-11 rounded-xl"><Link to="/register" onClick={closeMenu}>Get Started</Link></Button>
               </div>
             </nav>
           </motion.div>

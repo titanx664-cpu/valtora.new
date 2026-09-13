@@ -16,7 +16,7 @@ export default function Index() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground selection:bg-primary/30">
       <LandingHeader />
-      <main className="pt-[4.5rem]">
+      <main>
         <LandingHero />
         <LandingValueProps />
         <LandingHowItWorks />
