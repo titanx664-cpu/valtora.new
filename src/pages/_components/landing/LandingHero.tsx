@@ -39,7 +39,7 @@ export function LandingHero() {
 }
 
 function PlatformVisual() {
-  return <div className="clay relative aspect-[1.02/1] border-primary/20 p-4 sm:p-6">
+  return <div className="relative aspect-[1.02/1] rounded-[2rem] border border-primary/20 bg-card/65 p-4 shadow-[0_35px_100px_oklch(0.03_0.005_155_/_0.8),inset_0_1px_0_oklch(0.95_0.005_155_/_0.06)] backdrop-blur-xl sm:p-6">
     <div className="absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_50%_40%,oklch(0.72_0.18_155_/_0.16),transparent_42%)]" />
     <div className="absolute inset-[12%] rounded-full border border-primary/15" />
     <motion.div animate={{ rotate: 360 }} transition={{ duration: 32, repeat: Infinity, ease: "linear" }} className="absolute inset-[18%] rounded-full border border-dashed border-primary/25" />
