@@ -1,0 +1,2 @@
+import { Link } from 'react-router-dom'; import { Button } from '@/components/ui/button.tsx';
+export default function NotFound(){return <div className="min-h-screen bg-background flex items-center justify-center p-6 text-center"><div><p className="text-primary font-black tracking-widest">404</p><h1 className="text-4xl font-bold mt-2">Page not found</h1><p className="text-muted-foreground mt-3">The page you requested doesn't exist.</p><Link to="/" className="inline-block mt-6"><Button>Back home</Button></Link></div></div>}
