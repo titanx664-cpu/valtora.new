@@ -24,7 +24,7 @@ export default function AdminSupportPage() {
   };
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full min-h-[calc(100dvh-6rem)] pb-24 md:min-h-0 md:pb-0">
       {/* Sidebar — chat list */}
       <div className={cn(
         "flex flex-col border-r border-border bg-sidebar/30 flex-shrink-0",

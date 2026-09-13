@@ -81,13 +81,13 @@ export default function AdminPaymentAccounts() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-4xl space-y-6 p-4 sm:mx-auto sm:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Payment Accounts</h1>
           <p className="text-muted-foreground text-sm mt-1">Configure payment methods shown to users during deposits</p>
         </div>
-        <Button size="sm" onClick={openCreate}><Plus size={14} className="mr-1" /> Add Account</Button>
+        <Button className="w-full sm:w-auto" size="sm" onClick={openCreate}><Plus size={14} className="mr-1" /> Add Account</Button>
       </div>
 
       {accounts === undefined ? (
@@ -99,7 +99,7 @@ export default function AdminPaymentAccounts() {
       ) : (
         <div className="space-y-3">
           {accounts.map((acc: any) => (
-            <div key={acc._id} className={`flex items-center gap-4 p-4 rounded-xl border bg-card ${acc.isActive ? "border-border" : "border-border opacity-60"}`}>
+            <div key={acc._id} className={`flex flex-col gap-3 rounded-xl border bg-card p-4 sm:flex-row sm:items-center sm:gap-4 ${acc.isActive ? "border-border" : "border-border opacity-60"}`}>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-primary uppercase">{acc.method}</span>
@@ -109,8 +109,8 @@ export default function AdminPaymentAccounts() {
                 <p className="text-sm text-muted-foreground font-mono">{acc.accountNumber}</p>
                 {acc.instructions && <p className="text-xs text-muted-foreground mt-1">{acc.instructions}</p>}
               </div>
-              <div className="flex gap-2">
-                <Button size="sm" variant="secondary" onClick={() => handleToggle(acc)}>
+              <div className="grid w-full grid-cols-[1fr_auto_auto] gap-2 sm:flex sm:w-auto">
+                <Button className="w-full sm:w-auto" size="sm" variant="secondary" onClick={() => handleToggle(acc)}>
                   {acc.isActive ? "Disable" : "Enable"}
                 </Button>
                 <Button size="sm" variant="secondary" onClick={() => openEdit(acc)}>
@@ -126,7 +126,7 @@ export default function AdminPaymentAccounts() {
       )}
 
       <Dialog open={creating || !!editing} onOpenChange={() => { setCreating(false); setEditing(null); }}>
-        <DialogContent>
+        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>{creating ? "Add Payment Account" : "Edit Payment Account"}</DialogTitle>
           </DialogHeader>
@@ -136,9 +136,9 @@ export default function AdminPaymentAccounts() {
             <div className="space-y-1.5"><Label>Account Number</Label><Input value={form.accountNumber} onChange={(e) => setForm(f => ({ ...f, accountNumber: e.target.value }))} className="bg-input font-mono" /></div>
             <div className="space-y-1.5"><Label>Instructions (optional)</Label><Textarea value={form.instructions} onChange={(e) => setForm(f => ({ ...f, instructions: e.target.value }))} className="bg-input" rows={2} /></div>
           </div>
-          <DialogFooter>
-            <Button variant="secondary" onClick={() => { setCreating(false); setEditing(null); }}>Cancel</Button>
-            <Button onClick={handleSave} disabled={saving}>{saving ? "Saving..." : "Save"}</Button>
+          <DialogFooter className="sm:gap-2">
+            <Button className="w-full sm:w-auto" variant="secondary" onClick={() => { setCreating(false); setEditing(null); }}>Cancel</Button>
+            <Button className="w-full sm:w-auto" onClick={handleSave} disabled={saving}>{saving ? "Saving..." : "Save"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

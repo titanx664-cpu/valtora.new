@@ -27,7 +27,7 @@ export default function AdminAuditLogs() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl space-y-6 p-4 sm:mx-auto sm:p-6">
       <div>
         <h1 className="text-2xl font-bold">Audit Logs</h1>
         <p className="text-muted-foreground text-sm mt-1">All sensitive admin actions</p>
@@ -45,7 +45,7 @@ export default function AdminAuditLogs() {
             let meta: Record<string, unknown> = {};
             try { meta = JSON.parse(log.metadata ?? "{}"); } catch { /* ignore */ }
             return (
-              <div key={log._id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card">
+              <div key={log._id} className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium">{ACTION_LABELS[log.action] ?? log.action}</p>
@@ -58,7 +58,7 @@ export default function AdminAuditLogs() {
                     {meta.method ? ` · ${meta.method}` : ""}
                   </p>
                 </div>
-                <p className="text-xs text-muted-foreground flex-shrink-0">{formatDateTime(log._creationTime)}</p>
+                <p className="text-xs text-muted-foreground sm:flex-shrink-0">{formatDateTime(log._creationTime)}</p>
               </div>
             );
           })}

@@ -61,7 +61,7 @@ export default function AdminDeposits() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl space-y-6 p-4 sm:mx-auto sm:p-6">
       <div>
         <h1 className="text-2xl font-bold">Deposits</h1>
         <p className="text-muted-foreground text-sm mt-1">Review and approve user deposits</p>
@@ -93,7 +93,7 @@ export default function AdminDeposits() {
             return (
               <div
                 key={d._id}
-                className="flex items-center justify-between p-4 rounded-xl border border-border bg-card gap-4"
+                className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -105,18 +105,18 @@ export default function AdminDeposits() {
                   </p>
                   <p className="text-xs text-muted-foreground">{formatDateTime(d._creationTime)}</p>
                 </div>
-                <div className="text-right flex-shrink-0">
+                <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:block sm:text-right">
                   <p className="font-bold">{formatPKR(d.amount)}</p>
                   <span className={cn("text-xs px-2 py-0.5 rounded-full", STATUS_COLORS[d.status])}>
                     {d.status}
                   </span>
                 </div>
                 {d.status === "pending" && (
-                  <div className="flex gap-2 flex-shrink-0">
-                    <Button size="sm" onClick={() => { setSelected(d); setAction("approve"); }}>
+                  <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-shrink-0">
+                    <Button className="w-full sm:w-auto" size="sm" onClick={() => { setSelected(d); setAction("approve"); }}>
                       <CheckCircle size={14} className="mr-1" /> Approve
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={() => { setSelected(d); setAction("reject"); }}>
+                    <Button className="w-full sm:w-auto" size="sm" variant="destructive" onClick={() => { setSelected(d); setAction("reject"); }}>
                       <XCircle size={14} className="mr-1" /> Reject
                     </Button>
                   </div>
@@ -129,7 +129,7 @@ export default function AdminDeposits() {
 
       {/* Confirm dialog */}
       <Dialog open={!!selected} onOpenChange={() => { setSelected(null); setNote(""); }}>
-        <DialogContent>
+        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>{action === "approve" ? "Approve Deposit" : "Reject Deposit"}</DialogTitle>
           </DialogHeader>
@@ -151,9 +151,10 @@ export default function AdminDeposits() {
               </div>
             </div>
           )}
-          <DialogFooter>
-            <Button variant="secondary" onClick={() => setSelected(null)}>Cancel</Button>
+          <DialogFooter className="sm:gap-2">
+            <Button className="w-full sm:w-auto" variant="secondary" onClick={() => setSelected(null)}>Cancel</Button>
             <Button
+              className="w-full sm:w-auto"
               variant={action === "approve" ? "default" : "destructive"}
               onClick={handleAction}
               disabled={processing}
