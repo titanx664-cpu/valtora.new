@@ -32,7 +32,7 @@ export default function AdminUsers() {
                   {u.isAdmin && <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded">Admin</span>}
                   {!u.isActive && <span className="text-xs bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded">Inactive</span>}
                 </div>
-                <p className="break-all text-xs text-muted-foreground">@{u.username} · {u.email ?? "no email"}</p>
+                <p className="break-all text-xs text-muted-foreground">@{u.username} · {u.phone ?? u.email ?? "no contact"}</p>
                 <p className="text-xs text-muted-foreground">Joined {formatDateTime(u._creationTime)}</p>
                 <p className="text-xs text-muted-foreground">Code: <span className="font-mono">{u.referralCode}</span> · Referred by: {u.referredBy ? "Yes" : "Direct"}</p>
               </div>
