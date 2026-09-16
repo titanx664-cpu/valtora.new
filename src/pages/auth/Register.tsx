@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { PhoneNumberField } from '@/components/auth/phone-number-field.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card.tsx';
+import { normalizePhoneNumber } from '@/lib/phone.ts';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase.ts';
 import { executeMutation } from '@/lib/supabase-api.ts';
