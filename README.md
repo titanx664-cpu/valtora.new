@@ -12,11 +12,11 @@ Valtora is a React + Vite application migrated from the Hercules/Convex implemen
 1. Install Node.js 20+ and pnpm.
 2. Copy `.env.example` to `.env.local`.
 3. Add your Supabase project URL and browser-safe anon/publishable key.
-4. In Supabase SQL Editor, run the SQL migrations in numeric order, including `supabase/migrations/0001_valtora.sql` and `supabase/migrations/0002_correct_plan_payment_wallet_accounting.sql`.
+4. In Supabase SQL Editor, run the SQL migrations in numeric order, including `supabase/migrations/0007_restore_email_auth_registration.sql` if the abandoned phone migration was applied.
 5. Enable Email/Password authentication in Supabase Auth.
 6. Register your first account at `/register`.
-7. In Supabase SQL Editor, promote it to admin:
-   `update public.users set is_admin=true where email='YOUR-ADMIN-EMAIL';`
+7. In Supabase SQL Editor, promote it to admin (using the immutable profile ID or username):
+   `update public.users set is_admin=true where username='YOUR-ADMIN-USERNAME';`
 8. Seed the three original plans from the Admin Plans page, or run the `seed_default_plans` RPC through the app after becoming admin.
 9. Configure payment accounts from Admin → Payment Accounts.
 10. Run `pnpm install` then `pnpm dev`.
