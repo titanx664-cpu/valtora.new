@@ -10,9 +10,9 @@ import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase.ts';
 import { executeMutation } from '@/lib/supabase-api.ts';
 
-function loginError(error: unknown, identifier: 'phone number' | 'email address'): string {
+function loginError(error: unknown): string {
   const message = error instanceof Error ? error.message.toLowerCase() : '';
-  if (message.includes('invalid login credentials')) return `${identifier === 'phone number' ? 'Phone number' : 'Email address'} or password is incorrect.`;
+  if (message.includes('invalid login credentials')) return 'Email or password is incorrect.';
   if (message.includes('network') || message.includes('fetch')) return 'Network error. Check your connection and try again.';
   return 'Authentication failed. Please try again.';
 }
@@ -20,22 +20,17 @@ function loginError(error: unknown, identifier: 'phone number' | 'email address'
 export default function LoginPage() {
   const nav = useNavigate();
   const location = useLocation();
-  const [countryCode, setCountryCode] = useState('PK');
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [emailMigrationLogin, setEmailMigrationLogin] = useState(false);
   const [email, setEmail] = useState('');
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     if (!supabase) { toast.error('Supabase is not configured'); return; }
-    const phone = normalizePhoneNumber(countryCode, phoneNumber);
-    if (!emailMigrationLogin && !phone) { toast.error('Enter a valid phone number for the selected country.'); return; }
-    if (emailMigrationLogin && !email.trim()) { toast.error('Enter your email address.'); return; }
+    if (!email.trim()) { toast.error('Enter your email address.'); return; }
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword(emailMigrationLogin ? { email: email.trim(), password } : { phone: phone!, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       if (error) throw error;
       if (data.user) {
         const metadata = data.user.user_metadata || {};
@@ -46,7 +41,7 @@ export default function LoginPage() {
       toast.success('Welcome back');
       nav((location.state as { from?: string } | null)?.from || '/dashboard', { replace: true });
     } catch (error) {
-      toast.error(loginError(error, emailMigrationLogin ? 'email address' : 'phone number'));
+      toast.error(loginError(error));
     } finally {
       setLoading(false);
     }

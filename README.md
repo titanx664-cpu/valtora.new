@@ -12,8 +12,8 @@ Valtora is a React + Vite application migrated from the Hercules/Convex implemen
 1. Install Node.js 20+ and pnpm.
 2. Copy `.env.example` to `.env.local`.
 3. Add your Supabase project URL and browser-safe anon/publishable key.
-4. In Supabase SQL Editor, run the SQL migrations in numeric order through `supabase/migrations/0006_add_phone_auth_profiles.sql`.
-5. In Supabase Dashboard → Authentication → Providers, enable **Phone** and configure an SMS provider. Disable **Confirm phone** so signup creates a password session instead of an OTP verification flow. Email/Password can remain enabled during the existing-user transition.
+4. In Supabase SQL Editor, run the SQL migrations in numeric order, including `supabase/migrations/0007_restore_email_auth_registration.sql` if the abandoned phone migration was applied.
+5. Enable Email/Password authentication in Supabase Auth.
 6. Register your first account at `/register`.
 7. In Supabase SQL Editor, promote it to admin (using the immutable profile ID or username):
    `update public.users set is_admin=true where username='YOUR-ADMIN-USERNAME';`
