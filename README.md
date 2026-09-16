@@ -12,7 +12,7 @@ Valtora is a React + Vite application migrated from the Hercules/Convex implemen
 1. Install Node.js 20+ and pnpm.
 2. Copy `.env.example` to `.env.local`.
 3. Add your Supabase project URL and browser-safe anon/publishable key.
-4. In Supabase SQL Editor, run the SQL migrations in numeric order, including `supabase/migrations/0007_restore_email_auth_registration.sql` if the abandoned phone migration was applied.
+4. In Supabase SQL Editor, run the SQL migrations in numeric order.
 5. Enable Email/Password authentication in Supabase Auth.
 6. Register your first account at `/register`.
 7. In Supabase SQL Editor, promote it to admin (using the immutable profile ID or username):

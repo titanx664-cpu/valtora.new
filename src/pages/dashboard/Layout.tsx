@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, NavLink } from "react-router-dom";
 import { Authenticated, Unauthenticated, AuthLoading } from "@/lib/data-hooks.tsx";
 import { useQuery } from "@/lib/data-hooks.tsx";
 import { api } from "@/lib/api.ts";
@@ -36,10 +36,9 @@ const BOTTOM_NAV = [
 ];
 
 function DashboardGuard() {
-  const navigate = useNavigate();
   const isRegistered = useQuery(api.users.isRegistered);
   if (isRegistered === undefined) return null;
-  if (!isRegistered) { navigate("/register"); return null; }
+  if (!isRegistered) return <Navigate to="/register" replace />;
   return null;
 }
 
