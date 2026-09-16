@@ -1,6 +1,4 @@
--- The abandoned phone-auth migration may already have been applied. Retain its
--- nullable phone snapshot to avoid deleting data, but restore the original
--- email-backed profile registration flow.
+-- Email-backed profile registration flow.
 create or replace function public.register_user(p_username text, p_referral_code text default null) returns uuid
 language plpgsql security definer set search_path=pg_catalog, public, pg_temp as $$
 declare uid uuid := auth.uid(); ref uuid; code text; uname text := lower(trim(p_username)); existing uuid;
