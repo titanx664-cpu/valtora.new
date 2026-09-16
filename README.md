@@ -23,7 +23,7 @@ Valtora is a React + Vite application migrated from the Hercules/Convex implemen
 
 ## Security notes
 - Never put the Supabase service-role key in `.env.local` for this browser app or in client code.
-- New signups use Supabase Phone + Password with E.164 phone identifiers. SMS delivery must be configured for the Phone provider even when phone confirmation is disabled; Valtora does not use SMS OTP as a sign-in flow.
+- Authentication uses Supabase Email + Password. Enable the Email provider in Supabase Auth before registering users.
 - Financial mutations are implemented as security-definer PostgreSQL functions and protected by admin checks/RLS.
 - Withdrawal day is enforced by PostgreSQL using `Asia/Karachi` time.
 - The ledger is the balance source of truth; plan-purchase payments are retained for audit but explicitly excluded from the withdrawable wallet.
