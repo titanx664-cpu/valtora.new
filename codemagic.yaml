@@ -1,0 +1,46 @@
+workflows:
+  android-release:
+    name: Android release
+    environment:
+      node: 24
+      java: 21
+    scripts:
+      - name: Install JavaScript dependencies
+        script: npm install
+      - name: Build web assets
+        script: npm run build
+      - name: Create and sync Android project
+        script: |
+          [ -d android ] || npx cap add android
+          npx cap sync android
+      - name: Build unsigned Android bundle
+        script: |
+          java -version
+          cd android && ./gradlew bundleRelease
+    artifacts:
+      - android/app/build/outputs/**/*.aab
+
+  ios-release:
+    name: iOS release
+    environment:
+      node: 24
+      xcode: latest
+    scripts:
+      - name: Install JavaScript dependencies
+        script: npm install
+      - name: Build web assets
+        script: npm run build
+      - name: Create and sync iOS project
+        script: |
+          [ -d ios ] || npx cap add ios
+          npx cap sync ios
+      - name: Install CocoaPods dependencies
+        script: cd ios/App && pod install
+      - name: Build unsigned iOS archive
+        script: >-
+          cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App
+          -configuration Release -sdk iphoneos
+          CODE_SIGNING_ALLOWED=NO build
+
+# Configure Android keystore and Apple signing credentials in Codemagic before
+# distributing release artifacts. No signing credentials belong in this repository.
