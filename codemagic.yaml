@@ -3,6 +3,7 @@ workflows:
     name: Android release
     environment:
       node: 24
+      java: 21
     scripts:
       - name: Install JavaScript dependencies
         script: npm install
@@ -13,7 +14,9 @@ workflows:
           [ -d android ] || npx cap add android
           npx cap sync android
       - name: Build unsigned Android bundle
-        script: cd android && ./gradlew bundleRelease
+        script: |
+          java -version
+          cd android && ./gradlew bundleRelease
     artifacts:
       - android/app/build/outputs/**/*.aab
 
